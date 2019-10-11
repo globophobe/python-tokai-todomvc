@@ -1,0 +1,187 @@
+import aspect from '@mdx-deck/themes/aspect';
+import { syntaxHighlighter } from 'mdx-deck/themes'
+import theme from './theme';
+import arex from './assets/arex.jpg';
+import pony from './assets/pony.png';
+import ariadne from './assets/ariadne.png';
+import graphql from './assets/graphql.png';
+import unicorn from './assets/unicorn.jpg';
+import awesome from './assets/awesome.jpg';
+
+export const themes = [ aspect, syntaxHighlighter, theme ];
+
+# GraphQL with Django and Ariadne
+
+**＊矢印キーで進んでください＊**
+
+---
+
+# These slides are at Connpass. So you can check them out.
+## スライドはConnpassにアップされています。 是非みてください。
+
+---
+
+<SplitRight>
+
+<img style="border-radius: 35px;" width="75%" src={arex} />
+
+# My username on Connpass is "globophobe".
+## Connpassのユーザ名は「globophobe」です。
+
+</SplitRight>
+
+---
+
+<SplitRight>
+
+<img width="65%" src={pony} />
+
+# Django is the web framework for perfectionists with deadlines.
+
+</SplitRight>
+
+---
+
+<SplitRight>
+
+<img width="50%" src={ariadne} />
+
+# Ariadne is Python GraphQL schema first.
+
+</SplitRight>
+
+---
+
+# What does "schema first" mean?
+
+---
+
+# From the blog of Mirumee, the company developing Ariadne...
+
+---
+
+# In GraphQL, the API is defined using its own Schema Definition Language (SDL).
+
+---
+
+```
+from ariadne import (
+  ObjectType, QueryType, gql, make_executable_schema
+)
+from ariadne.asgi import GraphQL
+
+type_defs = gql(
+    """
+    type Person {
+        name: String
+        house: House
+        parents: [Person!]
+        isAlive: Boolean
+    }
+    type House {
+        name: String!
+        castle: String!
+        members: [Person!]
+    }
+    type Kingdom {
+        ruler: Person
+        kings: [Person!]
+    }
+    type Query {
+        kingdoms: [Kingdom!]!
+    }
+"""
+)
+
+query = QueryType()
+
+
+@query.field("kingdoms")
+def resolve_kingdoms(*_):
+    # Fetch and filter data you want
+    house_of_stark = {
+        "name": "Stark", 
+        "castle": "Winterfell"
+    }
+    king_in_the_north = {
+        "name": "Jon Snow", 
+        "house": house_of_stark, 
+        "isAlive": True
+    }
+    return [{"ruler": king_in_the_north}]
+
+
+schema = make_executable_schema(type_defs, [query])
+app = GraphQL(schema)
+```
+
+---
+
+```
+uvicorn --reload server:app
+```
+
+---
+
+<img style="border-radius: 35px;" width="98%" src={graphql} />
+
+---
+
+# The alternative to GraphQL schema first, is code first, for example graphene-python, graphql-ruby etc.
+
+---
+
+```
+import graphene
+
+
+class House(graphene.ObjectType):
+    name = graphene.String(required=True)
+    castle = graphene.String(required=True)
+    members = graphene.List(
+        graphene.NonNull(lambda: Person)
+    )
+
+
+class Person(graphene.ObjectType):
+    name = graphene.String(required=True)
+    house = graphene.Field(House)
+    parents = graphene.List(
+        graphene.NonNull(lambda: Person)
+    )
+    is_alive = graphene.Boolean()
+
+
+class Kingdom(graphene.ObjectType):
+    name = graphene.String(required=True)
+    castle = graphene.String(required=True)
+    members = graphene.List(graphene.NonNull(Person))
+
+
+class Query(graphene.ObjectType):
+    kingdoms = graphene.NonNull(
+        graphene.List(graphene.NonNull(Kingdom))
+    )
+
+    def resolve_kingdoms(self, info):
+        house_of_stark = {
+            "name": "Stark", 
+            "castle": "Winterfell"
+        }
+        king_in_the_north = {
+            "name": "Jon Snow",
+            "house": house_of_stark,
+            "is_alive": True,
+        }
+        return [{
+            "name": "The North", 
+            "ruler": king_in_the_north
+        }]
+
+
+schema = graphene.Schema(query=Query)
+```
+
+---
+
+# Having tried both, I prefer schema first.

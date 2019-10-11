@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "start": "mdx-deck presentation.mdx"
+  },
+  "dependencies": {
+    "gatsby-plugin-emotion": "^4.1.10",
+    "gatsby-plugin-mdx": "^1.0.50",
+    "mdx-deck": "^3.0.13"
+  }
+}
