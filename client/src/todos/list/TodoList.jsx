@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import PropTypes from "prop-types";
 import { SafeAreaView, FlatList, StyleSheet } from "react-native";
 import { Divider } from "react-native-paper";
-import { FilterContext } from "../../app/FilterContext";
+import { StateContext } from "../../app/StateContext";
 import TodoListItem from "./TodoListItem";
 import CreateTodo from "../create/CreateTodo";
 
@@ -14,11 +14,11 @@ const styles = StyleSheet.create({
 
 export default function TodoList({ allTodos }) {
   const {
-    state: { status }
-  } = useContext(FilterContext);
+    state: { filter }
+  } = useContext(StateContext);
   let todos;
-  if (status !== undefined) {
-    todos = allTodos.filter(({ completed }) => completed === status);
+  if (filter !== undefined) {
+    todos = allTodos.filter(({ completed }) => completed === filter);
   } else {
     todos = allTodos;
   }

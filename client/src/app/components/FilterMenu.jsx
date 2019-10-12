@@ -1,9 +1,9 @@
 import React, { useState, useContext } from "react";
 import { Appbar, Menu, Colors } from "react-native-paper";
-import { FilterContext } from "../FilterContext";
+import { StateContext } from "../StateContext";
 
 export default function FilterMenu() {
-  const { state, dispatch } = useContext(FilterContext);
+  const { dispatch } = useContext(StateContext);
   const [visible, setVisible] = useState(false);
   return (
     <Menu
@@ -11,16 +11,22 @@ export default function FilterMenu() {
       onDismiss={() => setVisible(!visible)}
       anchor={
         <Appbar.Action
-          icon="filter"
+          icon="sort"
           color={Colors.white}
           onPress={() => setVisible(!visible)}
         />
       }
     >
-      <Menu.Item onPress={() => dispatch({ type: "all" })} title="All" />
-      <Menu.Item onPress={() => dispatch({ type: "done" })} title="Done" />
       <Menu.Item
-        onPress={() => dispatch({ type: "notDone" })}
+        onPress={() => dispatch({ type: "filter", value: undefined })}
+        title="All"
+      />
+      <Menu.Item
+        onPress={() => dispatch({ type: "filter", value: true })}
+        title="Done"
+      />
+      <Menu.Item
+        onPress={() => dispatch({ type: "filter", value: false })}
         title="Not done"
       />
     </Menu>

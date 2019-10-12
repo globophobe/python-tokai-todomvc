@@ -1,23 +1,25 @@
-import React, { useContext } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { Appbar } from "react-native-paper";
 import FilterMenu from "./FilterMenu";
 import logout from "../../auth/logout";
 
-const status = React.createContext(undefined);
-
-export default function TodoHeader({ navigation }) {
-  const title = navigation.getParam("title");
+export default function TodoHeader({ navigation: { goBack, getParam } }) {
+  const title = getParam("title");
   const defaultTitle = "Todos";
   return (
     <Appbar.Header>
-      {title ? <Appbar.BackAction onPress={() => navigation.goBack()} /> : null}
+      {title ? <Appbar.BackAction onPress={() => goBack()} /> : null}
       <Appbar.Content title={title || defaultTitle} />
       <FilterMenu />
+      <Appbar.Action icon="exit-to-app" onPress={() => logout()} />
     </Appbar.Header>
   );
 }
 
 TodoHeader.propTypes = {
-  navigation: PropTypes.shape({ goBack: PropTypes.func.isRequired }).isRequired
+  navigation: PropTypes.shape({
+    goBack: PropTypes.func.isRequired,
+    getParam: PropTypes.func.isRequired
+  }).isRequired
 };
