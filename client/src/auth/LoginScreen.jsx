@@ -119,7 +119,7 @@ export default function LoginScreen({ navigation: { navigate } }) {
             onSubmitEditing={() => submit(values)}
             editable={!isSubmitting}
           />
-          <HelperText type="error" visible={errors.username && errors.username}>
+          <HelperText type="error" visible={errors.username}>
             {errors.username}
           </HelperText>
           <TextInput
@@ -134,7 +134,7 @@ export default function LoginScreen({ navigation: { navigate } }) {
             editable={!isSubmitting}
             secureTextEntry
           />
-          <HelperText type="error" visible={errors.password && errors.password}>
+          <HelperText type="error" visible={errors.password}>
             {errors.password}
           </HelperText>
           <Button
