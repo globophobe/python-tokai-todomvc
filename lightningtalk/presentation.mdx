@@ -42,6 +42,114 @@ export const themes = [ aspect, syntaxHighlighter, theme ];
 
 ---
 
+# GraphQL is...
+
+---
+
+...awesome!
+
+---
+
+# No really, in my own words.
+
+---
+
+# GraphQL maps strings to types.
+
+---
+
+For example, a GraphQL query string might be as follows.
+
+{ user { lastName firstName } }
+
+---
+
+The server response is.
+
+{
+  "data": {
+    "user": {
+      "lastName": "Test",
+      "firstName": "User"
+    }
+  }
+}
+
+---
+
+This is possible because the GraphQL schema on the server is as follows:
+
+type Query {
+  user: User
+}
+
+---
+
+So, querying { user }, returns a User type.
+
+---
+
+Defined as so:
+
+type User {
+  lastName: String!
+  firstName: String!                                                                        
+} 
+
+---
+
+And resolved by the following function:
+
+def resolve_user(_, info):                                                                     
+    user = info.context.user                                                                   
+    if user.is_authenticated:                                                                  
+        return user
+---
+
+In the resolver function, the "user" from info.context is the currently logged in user.
+
+---
+
+At first glance, GraphQL might seem unnecessarily complicated compared to a REST PI.
+
+---
+
+However, there are benefits:
+
+---
+
+1) Batching
+2) Can fetch as little or as much of data as required.
+3) Thanks to types, some pretty cool docs.
+
+---
+
+For example, consider the following type definition.
+
+type User {
+  lastName: String!
+  firstName: String!                                                                        
+	messages: [Message]!
+} 
+
+---
+
+A query as so...
+
+{ user 
+	{ 
+		lastName 
+		firstName 
+		messages { title body }
+	} 
+}
+
+---
+
+...combines the user query with a messages query in a single request.
+
+---
+
 <SplitRight>
 
 <img width="50%" src={ariadne} />
@@ -185,3 +293,17 @@ schema = graphene.Schema(query=Query)
 ---
 
 # Having tried both, I prefer schema first.
+
+---
+
+# About error handling, it may be desirable to define an Error type:
+
+type Error {
+	message: string
+}
+
+---
+
+As for 404, GraphQL clients such as Apollo return null, if the resolver function returns None.
+
+---
