@@ -1,0 +1,5 @@
+❯ curl localhost:8000/gql \
+  -F operations='{"query": "mutation uploadRecording($uuid: Uuid!, $field: String!, $upload: Upload!) {uploadRecording(uuid: $uuid, field: $field, upload: $upload)}", "variables": {"uuid": "c003ac3edcbd4e61924c729bb6ba632c", "field":"field", "upload":null }}' \
+  -F map='{"0": ["variables.upload"]}' \
+  -F 0=@test.txt
+

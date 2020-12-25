@@ -1,5 +1,10 @@
-from ariadne import MutationType, QueryType, gql
+from typing import Any, AsyncGenerator, Dict
+from uuid import UUID
 
+from ariadne import (EnumType, MutationType, QueryType, SubscriptionType,
+                     convert_kwargs_to_snake_case, gql)
+from ariadne.types import GraphQLResolveInfo
+from channels.layers import get_channel_layer
 from todomvc.decorators import is_authenticated
 
 from .models import Todo
@@ -17,6 +22,7 @@ todo_type_defs = gql(
 
 query = QueryType()
 mutation = MutationType()
+subscription = SubscriptionType()
 
 
 @query.field("allTodos")
@@ -51,5 +57,38 @@ def resolve_delete_todo(_, info, uuid):
     todo.delete()
     return todo
 
+@subscription.source("createTodo")
+@subscription.source("updateTodo")
+@is_authenticated
+async def subscription_generator(
+    obj: Any, info: GraphQLResolveInfo
+) -> AsyncGenerator[Dict, None]:
+    channel_layer = get_channel_layer()
+    subscription_source = info.context["subscription_source"]
+    while True:
+        msg = await channel_layer.receive(subscription_source)
+        if "ContentType" in msg:
+            if "uuid" in msg:
+                msg["uuid"] = UUID(msg["uuid"])
+            yield msg
 
-schema = [query, mutation]
+
+@is_authenticated
+@subscription.field("createTodo")
+def create_card_scan_resolver(msg, info):
+    if msg["ContentType"] == "Todo":
+        user = info.context["request"].user
+        if msg['user'] == user:
+            return msg
+
+
+@is_authenticated
+@subscription.field("updateTodo")
+def update_attendance_resolver(msg, info):
+    if msg["ContentType"] == "Todo":
+        user = info.context["request"].user
+        if msg['user'] == user:
+            return msg
+
+
+schema = [query, mutation, subscription]
